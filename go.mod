@@ -1,10 +1,9 @@
 module github.com/opslevel/opslevel-common/v2022
 
-go 1.17
+go 1.18
 
 require (
 	github.com/go-logr/logr v1.2.3
-	github.com/rs/zerolog v1.27.0
 	k8s.io/client-go v0.24.2
 )
 
