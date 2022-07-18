@@ -1,0 +1,12 @@
+---
+version: 1
+service:
+  name: Opslevel Common
+  lifecycle: pre-alpha
+  tier: tier_4
+  product:
+  owner: platform
+  language: Go
+  framework:
+  description: Library of common or utility code for sharing across all opslevel golang
+    projects
