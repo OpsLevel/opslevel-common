@@ -1,7 +1,10 @@
-name: "Release V2"
+name: "Release"
 
 on:
   workflow_dispatch: {}
+  repository_dispatch:
+    types:
+      - release
 
 permissions:
   contents: write
@@ -14,53 +17,68 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.ORG_GITHUB_TOKEN }}
       - name: Fetch All Tags
         run: git fetch --force --tags
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.18
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Import GPG Key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
       - name: Set Release Version
         id: version
         run: |
           echo "RELEASE_VERSION=$(date +v%Y.%-m.%-d)" >> $GITHUB_OUTPUT
+      - name: Ensure Release Does Not Exist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete ${{ steps.version.outputs.RELEASE_VERSION }} || true
+      - name: Set Package Version
+        run: |
+          cat << EOF > version.go
+          package opslevel
+  
+          const clientVersion = "${{ steps.version.outputs.RELEASE_VERSION }}"
+          EOF
       - name: Ensure Changelog
         run: |
-          if test -f .changes/${{ steps.version.outputs.RELEASE_VERSION }}.md
+          git config user.name "OpsLevel Bots"
+          git config user.email "bots@opslevel.com"
+          if test -f ./.changes/${{ steps.version.outputs.RELEASE_VERSION }}.md
           then
             echo "Skip Changie..."
           else
             go install github.com/miniscruff/changie@latest
             changie batch ${{ steps.version.outputs.RELEASE_VERSION }}
             changie merge
+            git add .
+            git commit -m "Cut Release '${{ steps.version.outputs.RELEASE_VERSION }}'"
+            git push origin HEAD
           fi
-      - name: Commit & Tag Release
-        run: |
-          git config user.name "OpsLevel Bots"
-          git config user.email "bots@opslevel.com"
-          git add .
-          git commit -m "Cut Release '${{ steps.version.outputs.RELEASE_VERSION }}'"
           git tag -f ${{ steps.version.outputs.RELEASE_VERSION }} -m "Cut Release '${{ steps.version.outputs.RELEASE_VERSION }}'"
-          git push origin HEAD
-          git push origin refs/tags/${{ steps.version.outputs.RELEASE_VERSION }}
-      - name: Ensure Release Does Not Exist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release delete ${{ steps.version.outputs.RELEASE_VERSION }} || true
-      - name: Import GPG Key
-        id: import_gpg
-        uses: hashicorp/ghaction-import-gpg@v2.1.0
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          git push -f origin refs/tags/${{ steps.version.outputs.RELEASE_VERSION }}
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4.2.0
+        uses: goreleaser/goreleaser-action@v4
         with:
-          args: release --rm-dist --release-notes=./changes/${{ steps.version.outputs.RELEASE_VERSION }}.md
+          args: release --rm-dist --release-notes=./.changes/${{ steps.version.outputs.RELEASE_VERSION }}.md
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ORG_GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
       - name: Report Release To OpsLevel
         uses: opslevel/report-deploy-github-action@v0.5.0
         with:
