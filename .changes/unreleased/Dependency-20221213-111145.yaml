@@ -1,4 +1,0 @@
-kind: "Dependency"
-body: "Bump k8s.io/client-go from 0.24.2 to 0.26.0"
-time: 2022-12-13T11:11:45.00000Z
-
