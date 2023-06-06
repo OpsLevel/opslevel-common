@@ -5,8 +5,18 @@ service:
   lifecycle: pre-alpha
   tier: tier_4
   product:
-  owner: platform
+  owner:
   language: Go
   framework:
   description: Library of common or utility code for sharing across all opslevel golang
     projects
+  aliases:
+  tags:
+  repositories:
+  - name: OpsLevel/opslevel-common
+    path: "/"
+    provider: github
+  tools:
+  dependencies:
+  alert_sources:
+
