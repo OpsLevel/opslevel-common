@@ -1,0 +1,4 @@
+run:
+  timeout: 2m
+  skip-files:
+    - version.go
