@@ -19,7 +19,7 @@ import (
 type ClientWrapper struct {
 	Client  kubernetes.Interface
 	Dynamic dynamic.Interface
-	Mapper  restmapper.DeferredDiscoveryRESTMapper
+	Mapper  *restmapper.DeferredDiscoveryRESTMapper
 }
 
 func getKubernetesConfig() (*rest.Config, error) {
@@ -58,5 +58,5 @@ func CreateKubernetesClient() (*ClientWrapper, error) {
 
 	// Suppress k8s client-go logs
 	klog.SetLogger(logr.Discard())
-	return &ClientWrapper{Client: client1, Dynamic: client2, Mapper: *mapper}, nil
+	return &ClientWrapper{Client: client1, Dynamic: client2, Mapper: mapper}, nil
 }

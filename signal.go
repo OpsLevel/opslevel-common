@@ -10,11 +10,12 @@ var onlyOneSignalHandler = make(chan struct{})
 
 // InitSignalHandler
 // Usage:
-// func Start() {
-//   log.Info().Msg("Starting...")
-//	 <-opslevel_common.InitSignalHandler() // Block until signals
-//	 log.Info().Msg("Stopping...")
-// }
+//
+//	func Start() {
+//	  log.Info().Msg("Starting...")
+//		 <-opslevel_common.InitSignalHandler() // Block until signals
+//		 log.Info().Msg("Stopping...")
+//	}
 func InitSignalHandler() <-chan struct{} {
 	close(onlyOneSignalHandler) // panics when called twice
 
