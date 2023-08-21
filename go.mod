@@ -1,6 +1,6 @@
-module github.com/opslevel/opslevel-common/v2022
+module github.com/opslevel/opslevel-common/v2023
 
-go 1.18
+go 1.20
 
 require (
 	github.com/go-logr/logr v1.2.4
