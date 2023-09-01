@@ -1,3 +1,3 @@
-package opslevel_common
+package opslevel
 
-const clientVersion = "v2023.5.5"
+const clientVersion = "v2023.9.1"
