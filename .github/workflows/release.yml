@@ -50,7 +50,7 @@ jobs:
       - name: Set Package Version
         run: |
           cat << EOF > version.go
-          package opslevel
+          package opslevel_common
 
           const clientVersion = "${{ steps.version.outputs.RELEASE_VERSION }}"
           EOF
