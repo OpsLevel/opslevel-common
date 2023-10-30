@@ -3,7 +3,7 @@ module github.com/opslevel/opslevel-common/v2023
 go 1.21
 
 require (
-	github.com/go-logr/logr v1.2.4
+	github.com/go-logr/logr v1.3.0
 	k8s.io/client-go v0.26.0
 	k8s.io/klog/v2 v2.100.1
 )
