@@ -8,6 +8,7 @@ import (
 )
 
 var onlyOneSignalHandler = make(chan struct{})
+var stopChannel = make(chan struct{})
 
 // InitSignalHandler
 // Usage:
@@ -20,21 +21,24 @@ var onlyOneSignalHandler = make(chan struct{})
 func InitSignalHandler() <-chan struct{} {
 	close(onlyOneSignalHandler) // panics when called twice
 
-	stop := make(chan struct{})
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	closeChannel := make(chan os.Signal, 2)
+	signal.Notify(closeChannel, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
-		<-c
-		close(stop)
-		<-c
+		<-closeChannel
+		close(stopChannel)
+		<-closeChannel
 		os.Exit(1) // second signal. Exit directly.
 	}()
 
-	return stop
+	return stopChannel
 }
 
 func Run(name string) {
 	log.Info().Msgf("Starting %s ...", name)
 	<-InitSignalHandler() // Block until signals
 	log.Info().Msgf("Stopping %s ...", name)
+}
+
+func Stop() {
+	close(stopChannel)
 }

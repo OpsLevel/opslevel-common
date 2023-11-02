@@ -52,7 +52,7 @@ jobs:
           cat << EOF > version.go
           package opslevel_common
 
-          const clientVersion = "${{ steps.version.outputs.RELEASE_VERSION }}"
+          const ReleaseVersion = "${{ steps.version.outputs.RELEASE_VERSION }}"
           EOF
       - name: Ensure Changelog
         run: |
