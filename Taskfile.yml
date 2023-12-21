@@ -3,14 +3,21 @@
 version: '3'
 
 tasks:
+  ci:
+    desc: Workflow to run in CI
+    deps: [install-gofumpt, install-golangci-lint]
+    cmds:
+      - task: lint
+      - task: test
+
   lint:
     desc: Formatting and linting
     cmds:
-      - gofumpt -d .
+      - test -z "$(gofumpt -d -e . | tee /dev/stderr)"
       - go vet ./...
       - golangci-lint run
 
-  lintfix:
+  fix:
     desc: Fix formatting and linting
     cmds:
       - gofumpt -w .

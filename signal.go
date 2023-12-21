@@ -1,23 +1,26 @@
 package opslevel_common
 
 import (
-	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/rs/zerolog/log"
 )
 
-var onlyOneSignalHandler = make(chan struct{})
-var stopChannel = make(chan struct{})
+var (
+	onlyOneSignalHandler = make(chan struct{})
+	stopChannel          = make(chan struct{})
+)
 
 // InitSignalHandler
 // Usage:
 //
-//	func Start() {
-//    log.Info().Msg("Starting...")
-//    <-opslevel_common.InitSignalHandler() // Block until signals
-//    log.Info().Msg("Stopping...")
-//	}
+//		func Start() {
+//	   log.Info().Msg("Starting...")
+//	   <-opslevel_common.InitSignalHandler() // Block until signals
+//	   log.Info().Msg("Stopping...")
+//		}
 func InitSignalHandler() <-chan struct{} {
 	close(onlyOneSignalHandler) // panics when called twice
 
