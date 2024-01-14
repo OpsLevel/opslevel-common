@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetSample(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		n    int
 		data []string
 		want []string
@@ -29,7 +29,7 @@ func TestGetSample(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var testname = fmt.Sprintf("n is %d slice is %v want", tt.n, tt.data)
+		testname := fmt.Sprintf("n is %d slice is %v want", tt.n, tt.data)
 		if tt.want != nil {
 			testname += fmt.Sprintf(" %v", tt.want)
 		} else {
@@ -37,7 +37,7 @@ func TestGetSample(t *testing.T) {
 		}
 
 		t.Run(testname, func(t *testing.T) {
-			var result = opslevel_common.GetSample(tt.n, tt.data)
+			result := opslevel_common.GetSample(tt.n, tt.data)
 
 			if len(result) != tt.n && tt.n > 1 && tt.n < len(result) {
 				t.Error("incorrect length")
@@ -49,7 +49,7 @@ func TestGetSample(t *testing.T) {
 				}
 			} else {
 				// applies to test cases only - should not have duplicate elements
-				var entries = map[string]struct{}{}
+				entries := map[string]struct{}{}
 				for i, elem := range result {
 					if _, ok := entries[elem]; ok {
 						t.Errorf("result elem %v pos %d not unique", elem, i)
@@ -59,7 +59,7 @@ func TestGetSample(t *testing.T) {
 				deepCopy := append([]string(nil), result...)
 				slices.Sort(deepCopy)
 				for i := range result {
-					var a, b = deepCopy[i], result[i]
+					a, b := deepCopy[i], result[i]
 					if a != b {
 						t.Errorf("result is not sorted, got sorted value '%s' vs result '%s", a, b)
 					}
